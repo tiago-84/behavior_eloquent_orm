@@ -8,23 +8,27 @@
      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 </head>
 <body>
+    <?php 
+       $post;    
+    ?>
     <div class="container my-5">
-        <form action="{{route('posts.store')}}" method="post" autocomplete="off">
+        <form action="{{route('posts.update', $post->id)}}" method="post" autocomplete="off">
             @csrf
+            @method('PUT')
 
             <div class="form-group">
                 <label for="title">Titulo:</label>
-                <input type="text" class="form-control" id="title" name="title">
+                <input type="text" class="form-control" value="{{$post->title}}" id="title" name="title">
             </div>
 
             <div class="form-group">
                 <label for="subtitle">Subtitulo:</label>
-                <input type="text" class="form-control" id="subtitle" name="subtitle">
+                <input type="text" class="form-control"  value="{{$post->subtitle}}" id="subtitle" name="subtitle">
             </div>
 
             <div class="form-group">
                 <label for="description">Descrição:</label>
-                <input type="text" class="form-control" id="description" name="description">
+                <input type="text" class="form-control" value="{{$post->description}}" id="description" name="description">
             </div>
 
             <button class="btn btn-primary my-2">Enviar!</button>
