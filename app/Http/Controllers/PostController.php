@@ -6,39 +6,59 @@ use Illuminate\Http\Request;
 use App\Models\Post;
 
 class PostController extends Controller
-{
-    public function index()
+{   
+
+    public function forceDelete($post)
     {
+        Post::onlyTrashed()->where(['id' =>$post])->forceDelete();
+        return redirect()->route('posts.trashed');
+
+    }
+
+    public function restore($post)
+    {
+        $post = Post::onlyTrashed()->where(['id' => $post])->first();
 
         
-       $posts = Post::where('created_at', '>=', date('Y-m-d H:i:s'))->orderBy('title', 'desc')->get();
-    //      foreach($posts as $post){
-    //          echo"
-    //         <h1>{$post->title}</h1>
-    //         <h2>{$post->subtitle}</h2>
-    //         <p>{$post->description}</p>
-    //         <hr>
-    //     ";
-    // }
+         if($post->trashed()){
+            $post->restore();
+        }
 
-        // $post = Post::where('created_at', '>=', date('Y-m-d H:i:s'))->first();
-        // echo"
-        //         <h1>{$post->title}</h1>
-        //         <h2>{$post->subtitle}</h2>
-        //         <p>{$post->description}</p>
-        //         <hr>
-        //     ";
-
+        return redirect()->route('posts.trashed');
         
-        // $post = Post::where('created_at', '>=', date('Y-m-d H:i:s'))->firstOrFail();
+    }
 
-        //     echo"
-        //         <h1>{$post->title}</h1>
-        //         <h2>{$post->subtitle}</h2>
-        //         <p>{$post->description}</p>
-        //         <hr>
-        //     ";
-     
+    public function trashed()
+    {
+        $posts = Post::onlyTrashed()->get();
+        return view('posts.trashed', ['posts' =>$posts]);
+    }
+
+    public function index()
+    {        
+            //$posts = Post::where('created_at', '>=', date('Y-m-d H:i:s'))->orderBy('title', 'desc')->get();
+            //      foreach($posts as $post){
+            //          echo"
+            //         <h1>{$post->title}</h1>
+            //         <h2>{$post->subtitle}</h2>
+            //         <p>{$post->description}</p>
+            //         <hr>
+            //     ";
+            // }
+            // $post = Post::where('created_at', '>=', date('Y-m-d H:i:s'))->first();
+            // echo"
+            //         <h1>{$post->title}</h1>
+            //         <h2>{$post->subtitle}</h2>
+            //         <p>{$post->description}</p>
+            //         <hr>
+            //     ";                
+            // $post = Post::where('created_at', '>=', date('Y-m-d H:i:s'))->firstOrFail();
+            //     echo"
+            //         <h1>{$post->title}</h1>
+            //         <h2>{$post->subtitle}</h2>
+            //         <p>{$post->description}</p>
+            //         <hr>
+            //     ";     
             // $post = Post::find(1);
             //     echo"
             //     <h1>{$post->title}</h1>
@@ -46,9 +66,8 @@ class PostController extends Controller
             //     <p>{$post->description}</p>
             //     <hr>
             // ";
-
             //max - min - sum - count - svg   
-           // $posts = Post::where('created_at', '>=', date('Y-m-d H:i:s'))->max('title');
+            // $posts = Post::where('created_at', '>=', date('Y-m-d H:i:s'))->max('title');
                 // foreach($posts as $post){
                 //     echo"
                 //     <h1>{$post->title}</h1>
@@ -58,6 +77,7 @@ class PostController extends Controller
                 // ";
 
             $posts = Post::all();
+            //$posts = Post::withTrashed()->get();
             return view('posts.index', ['posts' => $posts]);
     }
 
@@ -70,19 +90,19 @@ class PostController extends Controller
     public function store(Request $request)
     {
         //Object -> Prop -> Save
-        $post = new Post();
-        $post->title = $request->title;
-        $post->subtitle = $request->subtitle;
-        $post->description = $request->description;
-        $post->save();
+        // $post = new Post();
+        // $post->title = $request->title;
+        // $post->subtitle = $request->subtitle;
+        // $post->description = $request->description;
+        // $post->save();
 
         
         //mass assignment
-        // Post::create([
-        //     'title' => $request->title,
-        //     'subtitle' => $request->subtitle,
-        //     'description' => $request->description            
-        // ]);
+        Post::create([
+            'title' => $request->title,
+            'subtitle' => $request->subtitle,
+            'description' => $request->description            
+        ]);
 
 
         // $post = Post::firstOrNew([
@@ -102,7 +122,7 @@ class PostController extends Controller
         // ]);
         // var_dump($post);
 
-        return redirect()->route('post.index');       
+        return redirect()->route('posts.index');      
         
     }
 
@@ -145,7 +165,8 @@ class PostController extends Controller
     public function destroy(Post $post)
     {
         //var_dump($post);
-        //Post::find($post->id)->delete();
+        Post::find($post->id)->delete();
+
         //Post::destroy([2, 3]); este não funcionou.
         //Post::destroy($post->id);
         //Post::where('created_at', '>=', date('Y-m-d H:i:s'))->delete(); este não funcionou.
